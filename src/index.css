@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Header */
+@layer components {
+  .header_nav_items {
+    @apply cursor-pointer py-3 text-sm font-semibold text-gray-400 border-b-[3px] border-b-transparent hover:border-b-[3px] hover:border-b-red-500;
+  }
+}
