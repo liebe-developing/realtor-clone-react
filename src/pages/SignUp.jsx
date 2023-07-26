@@ -4,9 +4,19 @@ import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import Key from "../assets/images/key.avif";
 import { Link } from "react-router-dom";
 import OAuth from "../components/OAuth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { db } from "../firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -21,6 +31,46 @@ const SignUp = () => {
       [e.target.id]: e.target.value,
     }));
   };
+
+  /* Submit */
+  const onSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const auth = getAuth();
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      updateProfile(auth.currentUser, {
+        displayName: name,
+      });
+      const user = userCredential.user;
+      const formDataCopy = { ...formData };
+      delete formDataCopy.password;
+      formDataCopy.timestamp = serverTimestamp();
+
+      await setDoc(doc(db, "users", user.uid), formDataCopy);
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+      });
+      toast.success("Your account was created successfully");
+      navigate("/");
+    } catch (error) {
+      if (!name) {
+        toast.error("Please write your full name");
+      }
+      if (error.message === "Firebase: Error (auth/invalid-email).") {
+        toast.error("Email should not be empty!");
+      }
+      if (error.message === "Firebase: Error (auth/missing-password).") {
+        toast.error("Please set a password for your account");
+      }
+    }
+  };
   return (
     <section>
       <h1 className="text-3xl text-center mt-6 font-bold">Sign Up</h1>
@@ -29,7 +79,7 @@ const SignUp = () => {
           <img src={Key} alt="Key" className="w-full rounded-2xl" />
         </div>
         <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-          <form>
+          <form onSubmit={onSubmit}>
             <input
               id="name"
               type="text"
