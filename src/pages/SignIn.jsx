@@ -42,7 +42,7 @@ const SignIn = () => {
         navigate("/");
       }
     } catch (error) {
-      toast.erro("Bad user credentials");
+      toast.error("Bad user credentials");
     }
   };
 
