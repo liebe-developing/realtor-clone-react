@@ -1,10 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import RealtorLogo from "../assets/images/realtor-logo.svg";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuthStatus } from "../hooks/useAuthStatus";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useEffect } from "react";
 
 const Header = () => {
+  const [pageState, setPageState] = useState("Sign in");
   const location = useLocation();
   const navigate = useNavigate();
+  const auth = getAuth();
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setPageState("Profile");
+      } else {
+        setPageState("Sign in");
+      }
+    });
+  }, [auth]);
 
   const pathMatchRoute = (route) => {
     if (route === location.pathname) {
@@ -41,13 +55,15 @@ const Header = () => {
             >
               Offers
             </li>
+
             <li
-              className={`${
-                pathMatchRoute("/sign-in") && "text-black border-b-red-500"
-              } header_nav_items`}
-              onClick={() => navigate("/sign-in")}
+              className={`header_nav_items ${
+                (pathMatchRoute("/sign-in") || pathMatchRoute("/profile")) &&
+                "text-black border-b-red-500"
+              }`}
+              onClick={() => navigate("/profile")}
             >
-              Sign in
+              {pageState}
             </li>
           </ul>
         </div>
