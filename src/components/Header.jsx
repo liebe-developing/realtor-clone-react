@@ -27,7 +27,7 @@ const Header = () => {
   };
 
   return (
-    <div className="border-b bg-white shadow-sm sticky top-0 z-50 select-none">
+    <div className="border-b bg-white shadow-sm sticky top-0 z-40 select-none">
       <header className="flex items-center justify-between px-3 max-w-6xl mx-auto">
         <div>
           <img
